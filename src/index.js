@@ -9,6 +9,9 @@ import {
   onSnapshot,
   query,
   where,
+  orderBy,
+  serverTimestamp,
+  getDoc,
 } from 'firebase/firestore'
 
 const firebaseConfig = {
@@ -42,8 +45,8 @@ const colRef = collection(db, 'books')
 //   .catch(err => console.error(err.message))
 
 // query
-// when we query this doc, onSnapshot will work
-const q = query(colRef, where("author", "==", "khalil"))
+// when we query this doc, onSnapshot will work, // Order by
+const q = query(colRef, where("author", "==", "khalil"), orderBy("createdAt"))
 
 
 // realtime collection data
@@ -62,9 +65,12 @@ addBookForm.addEventListener('submit', (e) => {
 
   addDoc(colRef, {
     title: addBookForm.title.value,
-    author: addBookForm.author.value
+    author: addBookForm.author.value,
+    createdAt: serverTimestamp()
   }).then((res) => {
     addBookForm.reset()
+  }).catch(err => {
+    console.log(err.message)
   })
 })
 
@@ -82,3 +88,13 @@ deleteBookForm.addEventListener('submit', (e) => {
   })
 })
 
+// get single document 
+const docRef = doc(db, 'books', 'ofBVblVnpS2RsfH1bnYw')
+// getDoc(docRef).then((doc) => {
+//   console.log(doc.data(),)
+// })
+
+// realtime
+onSnapshot(docRef, (doc) => {
+  console.log(doc.data(), doc.id)
+})
